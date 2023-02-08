@@ -7,12 +7,14 @@ import { indigo, pink } from '@mui/material/colors';
 import { AlertDialog } from './components/AlertDialog';
 
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FormDialog } from './components/FormDialog'
 import { ActionButton } from "./components/ActionButton";
 import { SideBar } from "./components/SideBar";
 import { TodoItem } from './components/TodoItem'
 import { QR } from './components/QR';
+import { isTodos } from './lib/isTodos';
+import localforage from 'localforage';
 
 // テーマを作成
 // <ThemeProvider>でラップすると使用可能
@@ -32,6 +34,7 @@ const theme = createTheme({
 });
 
 export const App = () => {
+
 	// slide menu
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const handleToggleDrawer = () => setDrawerOpen(!drawerOpen);
@@ -141,6 +144,23 @@ export const App = () => {
 		const newTodos = todos.filter((todo) => !todo.removed);
 		setTodos(newTodos);
 	}
+
+
+	// 第二引数 []時はDOMのレンダリング後のみ実行
+	// A || B や A && B は Aの判定結果にしたがって、AまたはBを返す演算子
+	// A || B  AがtrueならA, AがfalseならBを返す
+	// A && B  AがtrueならB, AがfalseならAを返す →結果として OR, ANDの結果を得る
+	// ↓isTodosがtrueを返せば,setTodosが返る(setTodosが実行される)
+		useEffect(() => {
+			localforage
+				.getItem('todo-20230202')
+				.then((values) => isTodos(values) && setTodos(values));
+		}, []);
+
+		// 第二引数 [値]時は対象の値更新時に実行される
+		useEffect(() => {
+			localforage.setItem('todo-20230202', todos);
+		}, [todos]);
 
 	// 条件式 ? (A) : (B)  -> trueならA, falseならB 
 	// 条件式 && (A)  -> trueならA, falseなら描画しない

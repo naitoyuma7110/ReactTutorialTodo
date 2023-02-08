@@ -1,14 +1,8 @@
 import { useState } from "react";
-
-// Todoオブジェクトの型定義
-type Todo = {
-	value: string,
-	readonly id: number,
-	checked: boolean,
-	removed: boolean;
-};
-
-type Filter = 'all' | 'checked' | 'unchecked' | 'removed';
+import { FormDialog } from './FormDialog'
+import { ActionButton } from "./ActionButton";
+import { SideBar } from "./SideBar";
+import {TodoItem} from './TodoItem'
 
 export const App = () => {
 	// 各hndle関数の共通処理を型定義する
@@ -67,27 +61,27 @@ export const App = () => {
 		setText(e.target.value);
 	};
 
-	const handleEdit = (id: number, value: string) => {
+	// const handleEdit = (id: number, value: string) => {
 
-		//.map()は非破壊的ではないが、ネストしたプロパティはコピーされずの参照先は変わらない
-		//.map()で参照するプロパティに対する変更はオリジナルへのミューテート扱いとなる
+	// 	//.map()は非破壊的ではないが、ネストしたプロパティはコピーされずの参照先は変わらない
+	// 	//.map()で参照するプロパティに対する変更はオリジナルへのミューテート扱いとなる
 
-		// そのため.mapをスプレッドで展開しディープコピーする
-		const deepCopy = todos.map((todo) => ({ ...todo }));
+	// 	// そのため.mapをスプレッドで展開しディープコピーする
+	// 	const deepCopy = todos.map((todo) => ({ ...todo }));
 
-		const newTodos = deepCopy.map((todo) => {
-			if (todo.id === id) {
-				todo.value = value;
-			}
-			return todo;
-		})
+	// 	const newTodos = deepCopy.map((todo) => {
+	// 		if (todo.id === id) {
+	// 			todo.value = value;
+	// 		}
+	// 		return todo;
+	// 	})
 
-		// todos ステートが書き換えられていないかチェック
-		console.log('=== Original todos ===');
-		todos.map((todo) => console.log(`id: ${todo.id}, value: ${todo.value}`));
+	// 	// todos ステートが書き換えられていないかチェック
+	// 	console.log('=== Original todos ===');
+	// 	todos.map((todo) => console.log(`id: ${todo.id}, value: ${todo.value}`));
 
-		setTodos(newTodos);
-	}
+	// 	setTodos(newTodos);
+	// }
 	// handleTodoに統一
 	// const handleCheck = (id: number, checked:boolean) => {
 	// 	const deepCopy = todos.map((todo) => ({ ...todo }));
@@ -116,21 +110,6 @@ export const App = () => {
 	// 	setTodos(newTodos);
 	// }
 
-	const filteredTodos = todos.filter((todo) => {
-		switch (filter) {
-			case 'all':
-				return !todo.removed
-			case 'checked':
-				return todo.checked && !todo.removed
-			case 'unchecked':
-				return !todo.checked && !todo.removed
-			case 'removed':
-				return todo.removed
-			default:
-				return todo;
-		}
-	})
-
 	const handleFilter = (filter:Filter) => {
 		setFilter(filter);
 	}
@@ -142,69 +121,28 @@ export const App = () => {
 		setTodos(newTodos);
 	}
 
+	// 条件式 ? (A) : (B)  -> trueならA, falseならB 
+	// 条件式 && (A)  -> trueならA, falseなら描画しない
 	return (
 		<div>
-			<select defaultValue="all" onChange={(e) => handleFilter(e.target.value as Filter)}>
-        <option value="all">すべてのタスク</option>
-        <option value="checked">完了したタスク</option>
-        <option value="unchecked">現在のタスク</option>
-        <option value="removed">ごみ箱</option>
-			</select>
-			{filter === 'removed' ? (
-				<button onClick={() => handleEmpty()}>ゴミ箱を空にする</button>
-			) : ( 
-					// 上記かつfilter !== checkedならば
-					filter !== 'checked' && (
-						<form onSubmit={(e) => {
-							e.preventDefault();
-							handleSubmit();
-						}}>
-							<input
-								type="text"
-								value={text}
-								// disabled={filter === 'checked' || filter === 'removed'}
-								onChange={(e) => handleChange(e)}
-							/>
-							<input
-								type="submit"
-								value="追加"
-								// disabled={filter === 'checked' || filter === 'removed'}
-								onSubmit={handleSubmit}
-							/>
-						</form>
-					)
-			)}
-
-		<ul>
-				{filteredTodos.map((todo) => {
-					return (
-						<li key={todo.id}>
-							<input
-								type="checkbox"
-								checked={todo.checked}
-								disabled={todo.removed}
-								onChange={() => handleTodo(
-									todo,
-									'checked',
-									!todo.checked
-								)}
-							/>
-							<input
-								type="text"
-								disabled={todo.checked || todo.removed}
-								value={todo.value}
-								onChange={(e) => {
-									handleEdit(todo.id, e.target.value)
-								}}
-							/>
-							<button onClick={() => handleTodo(todo, 'removed', !todo.removed)}>
-								{todo.removed ? '復元' : '削除'}
-							</button>
-						</li>
-					)
-				})}
+			<SideBar
+				onSort={handleFilter}
+			/>
+				<ActionButton
+					onEmpty={handleEmpty}
+					todos={todos}
+				/>
+			<FormDialog
+				text={text}
+				onChange={handleChange}
+				onSubmit={handleSubmit}
+			/>
+			<TodoItem
+				todos={todos}
+				filter={filter}
+				onTodo={handleTodo}
+			/>
 				
-		</ul>
 		</div>
 	);
 };

@@ -12,9 +12,6 @@ type Props = {
 export const FormDialog = (props:Props) => {
   return (
   <div>
-    <Button variant="outlined" onClick={props.onToggleDialog}>
-        タスクの追加
-    </Button>
     <Dialog fullWidth open={props.dialogOpen} onClose={props.onToggleDialog}>
       <form
         onSubmit={(e) => {

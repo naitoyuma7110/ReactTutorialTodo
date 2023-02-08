@@ -4,6 +4,7 @@ import { ToolBar } from "./global/ToolBar";
 // スタイルエンジンのモジュールとカラーをインポート
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { indigo, pink } from '@mui/material/colors';
+import { AlertDialog } from './components/AlertDialog';
 
 
 import { useState } from "react";
@@ -46,6 +47,12 @@ export const App = () => {
 		// フォームへの入力をクリア
 		setText('');
 	};
+
+	// delete dialog
+	const [alertOpen, setAlertOpen] = useState(false);
+	const handleToggleAlert = () => setAlertOpen(!alertOpen);
+
+
 
 	// 各hndle関数の共通処理を型定義する
 	// =>todo型のオブジェクトを受け取り、その中の特定のプロパティを指定した値に更新する処理
@@ -125,55 +132,6 @@ export const App = () => {
 		handleDelete, 
 		はhandleTodoに統一 --*/ 
 
-	// const handleEdit = (id: number, value: string) => {
-	
-	// 	//.map()は非破壊的ではないが、ネストしたプロパティはコピーされずの参照先は変わらない
-	// 	//.map()で参照するプロパティに対する変更はオリジナルへのミューテート扱いとなる
-
-	// 	// そのため.mapをスプレッドで展開しディープコピーする
-	// 	const deepCopy = todos.map((todo) => ({ ...todo }));
-
-	// 	const newTodos = deepCopy.map((todo) => {
-	// 		if (todo.id === id) {
-	// 			todo.value = value;
-	// 		}
-	// 		return todo;
-	// 	})
-
-	// 	// todos ステートが書き換えられていないかチェック
-	// 	console.log('=== Original todos ===');
-	// 	todos.map((todo) => console.log(`id: ${todo.id}, value: ${todo.value}`));
-
-	// 	setTodos(newTodos);
-	// }
-
-	// const handleCheck = (id: number, checked:boolean) => {
-	// 	const deepCopy = todos.map((todo) => ({ ...todo }));
-
-	// 	const newTodos = deepCopy.map((todo) => {
-	// 		if (todo.id === id ) {
-	// 			todo.checked = !checked;
-	// 		}
-	// 		return todo;
-	// 	})
-
-	// 	setTodos(newTodos);
-	// }
-
-	// const handleDelete = (id: number,  removed:boolean) => {
-	// 	const deepCopy = todos.map((todo) => ({ ...todo }));
-
-	// 	const newTodos = deepCopy.map((todo) => {
-	// 		if (todo.id === id) {
-	// 			todo.removed = !removed;
-	// 		}
-	// 		return todo;
-	// 	})
-
-	// 	setTodos(newTodos);
-	// }
-
-
 	const handleFilter = (filter:Filter) => {
 		setFilter(filter);
 	}
@@ -201,9 +159,18 @@ export const App = () => {
 				onToggleDrawer={handleToggleDrawer}
 				onToggleQR={handleToggleQR}
 			/>
+			<AlertDialog
+        alertOpen={alertOpen}
+        onToggleAlert={handleToggleAlert}
+        onEmpty={handleEmpty}
+      />
 			<ActionButton
-				onEmpty={handleEmpty}
 				todos={todos}
+				filter={filter}
+				alertOpen={alertOpen}
+        dialogOpen={dialogOpen}
+        onToggleAlert={handleToggleAlert}
+        onToggleDialog={handleToggleDialog}
 			/>
 			<FormDialog
 				text={text}

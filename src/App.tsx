@@ -1,10 +1,38 @@
+import GlobalStyles from '@mui/material/GlobalStyles';
+import { ToolBar } from "./global/ToolBar";
+
+// スタイルエンジンのモジュールとカラーをインポート
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { indigo, pink } from '@mui/material/colors';
+
+
 import { useState } from "react";
-import { FormDialog } from './FormDialog'
-import { ActionButton } from "./ActionButton";
-import { SideBar } from "./SideBar";
-import {TodoItem} from './TodoItem'
+import { FormDialog } from './components/FormDialog'
+import { ActionButton } from "./components/ActionButton";
+import { SideBar } from "./components/SideBar";
+import { TodoItem } from './components/TodoItem'
+
+// テーマを作成
+// <ThemeProvider>でラップすると使用可能
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: indigo[500],
+      light: '#757de8',
+      dark: '#002984',
+    },
+    secondary: {
+      main: pink[500],
+      light: '#ff6090',
+      dark: '#b0003a',
+    },
+  },
+});
 
 export const App = () => {
+	const [drawerOpen, setDrawerOpen] = useState(true);
+  const handleToggleDrawer = () => setDrawerOpen(!drawerOpen);
+
 	// 各hndle関数の共通処理を型定義する
 	// =>todo型のオブジェクトを受け取り、その中の特定のプロパティを指定した値に更新する処理
 
@@ -32,12 +60,26 @@ export const App = () => {
 	// [value, action] = useState('initValue')
 	const [text, setText] = useState('');
 
-	const [todos, setTodos] = useState<Todo[]>([{
+	const [todos, setTodos] = useState<Todo[]>([
+		{
 		value: 'HELLO',
 		id: 11,
 		checked: false,
 		removed: false
-	}]);
+		},
+		{
+			value: 'Checked',
+			id: 12,
+			checked: true,
+			removed: false
+		},
+		{
+			value: 'Unchecked',
+			id: 1,
+			checked: false,
+			removed: false
+			},
+	]);
 
 	const [filter, setFilter] = useState<Filter>('all');
 
@@ -60,9 +102,14 @@ export const App = () => {
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setText(e.target.value);
 	};
+/*--以下3つの関数 
+		handleEdit, 
+		handleCheck, 
+		handleDelete, 
+		はhandleTodoに統一 --*/ 
 
 	// const handleEdit = (id: number, value: string) => {
-
+	
 	// 	//.map()は非破壊的ではないが、ネストしたプロパティはコピーされずの参照先は変わらない
 	// 	//.map()で参照するプロパティに対する変更はオリジナルへのミューテート扱いとなる
 
@@ -82,7 +129,7 @@ export const App = () => {
 
 	// 	setTodos(newTodos);
 	// }
-	// handleTodoに統一
+
 	// const handleCheck = (id: number, checked:boolean) => {
 	// 	const deepCopy = todos.map((todo) => ({ ...todo }));
 
@@ -96,7 +143,6 @@ export const App = () => {
 	// 	setTodos(newTodos);
 	// }
 
-	// handleTodoに統一
 	// const handleDelete = (id: number,  removed:boolean) => {
 	// 	const deepCopy = todos.map((todo) => ({ ...todo }));
 
@@ -110,10 +156,10 @@ export const App = () => {
 	// 	setTodos(newTodos);
 	// }
 
+
 	const handleFilter = (filter:Filter) => {
 		setFilter(filter);
 	}
-
 
 	const handleEmpty = () => {
 		// ネストへの変更ではなく、オブジェクトそのものを削除するため、ディープコピーは不要
@@ -124,26 +170,35 @@ export const App = () => {
 	// 条件式 ? (A) : (B)  -> trueならA, falseならB 
 	// 条件式 && (A)  -> trueならA, falseなら描画しない
 	return (
-		<div>
+		<ThemeProvider theme={theme}>
+			<GlobalStyles styles={{ body: { margin: 0, padding: 0 } }} />
+			<ToolBar
+				filter={filter}
+				drawerOpen={drawerOpen}
+				onToggleDrawer={handleToggleDrawer}
+
+			/>
 			<SideBar
 				onSort={handleFilter}
+				drawerOpen={drawerOpen}
+				onToggleDrawer={handleToggleDrawer}
 			/>
-				<ActionButton
-					onEmpty={handleEmpty}
-					todos={todos}
-				/>
+			<ActionButton
+				onEmpty={handleEmpty}
+				todos={todos}
+			/>
 			<FormDialog
 				text={text}
 				onChange={handleChange}
 				onSubmit={handleSubmit}
+				filter={filter}
 			/>
 			<TodoItem
 				todos={todos}
 				filter={filter}
 				onTodo={handleTodo}
 			/>
-				
-		</div>
+		</ThemeProvider>
 	);
 };
 

@@ -1,6 +1,7 @@
 // this component's props type
 type Props = {
   text: string,
+  filter: Filter,
   onSubmit: () => void,
   onChange: (e: React.ChangeEvent<HTMLInputElement>)=> void
 }
@@ -16,7 +17,7 @@ export const FormDialog = (props:Props) => {
         value={props.text}
         // disabled={filter === 'checked' || filter === 'removed'}
         // onChange={(e) => handleChange(e)}
-        onChange={(e)=> props.onChange(e)}
+        onChange={(e) => props.onChange(e)}
       />
       <input
         type="submit"
@@ -24,6 +25,8 @@ export const FormDialog = (props:Props) => {
         // disabled={filter === 'checked' || filter === 'removed'}
         // onSubmit={handleSubmit}
         onSubmit={props.onSubmit}
+        disabled={props.filter !== 'all'}
+
       />
     </form>
   )

@@ -40,7 +40,8 @@ type Props = {
   // Filter型(文字列)を引数に持つ
   onSort: (filter: Filter) => void,
   drawerOpen:boolean,
-  onToggleDrawer:()=> void
+  onToggleDrawer: () => void,
+  onToggleQR: () => void;
 }
 
 
@@ -126,15 +127,17 @@ export const SideBar = (props: Props) => {
               <ListItemText secondary="ゴミ箱" />
             </ListItemButton>
           </ListItem>
-      </List>
+        </List>
+        <Divider />
+          <ListItem disablePadding>
+            <ListItemButton onClick={props.onToggleQR}>
+              <ListItemIcon>
+                <Icon>share</Icon>
+              </ListItemIcon>
+              <ListItemText secondary="このアプリを共有" />
+            </ListItemButton>
+          </ListItem>
       </DrawerList>
     </Drawer>
   )
 } 
-
-{/* <select defaultValue="all" onChange={(e) => props.onSort(e.target.value as Filter)}>
-  <option value="all">すべてのタスク</option>
-  <option value="checked">完了したタスク</option>
-  <option value="unchecked">現在のタスク</option>
-  <option value="removed">ごみ箱</option>
-</select> */}

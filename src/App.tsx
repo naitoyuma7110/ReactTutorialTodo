@@ -11,6 +11,7 @@ import { FormDialog } from './components/FormDialog'
 import { ActionButton } from "./components/ActionButton";
 import { SideBar } from "./components/SideBar";
 import { TodoItem } from './components/TodoItem'
+import { QR } from './components/QR';
 
 // テーマを作成
 // <ThemeProvider>でラップすると使用可能
@@ -30,8 +31,13 @@ const theme = createTheme({
 });
 
 export const App = () => {
+	// slide menu
 	const [drawerOpen, setDrawerOpen] = useState(true);
-  const handleToggleDrawer = () => setDrawerOpen(!drawerOpen);
+	const handleToggleDrawer = () => setDrawerOpen(!drawerOpen);
+
+	// QR
+	const [qrOpen, setQrOpen] = useState(false);
+	const handleToggleQR = () => setQrOpen(!qrOpen);
 
 	// 各hndle関数の共通処理を型定義する
 	// =>todo型のオブジェクトを受け取り、その中の特定のプロパティを指定した値に更新する処理
@@ -182,6 +188,11 @@ export const App = () => {
 				onSort={handleFilter}
 				drawerOpen={drawerOpen}
 				onToggleDrawer={handleToggleDrawer}
+				onToggleQR={handleToggleQR}
+			/>
+			<QR
+				open={qrOpen}
+				onClose={handleToggleQR}
 			/>
 			<ActionButton
 				onEmpty={handleEmpty}

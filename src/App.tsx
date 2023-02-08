@@ -32,12 +32,20 @@ const theme = createTheme({
 
 export const App = () => {
 	// slide menu
-	const [drawerOpen, setDrawerOpen] = useState(true);
+	const [drawerOpen, setDrawerOpen] = useState(false);
 	const handleToggleDrawer = () => setDrawerOpen(!drawerOpen);
 
 	// QR
 	const [qrOpen, setQrOpen] = useState(false);
 	const handleToggleQR = () => setQrOpen(!qrOpen);
+
+	// daialog 
+	const [dialogOpen, setDialogOpen] = useState(false);
+	const handleToggleDialog = () => {
+		setDialogOpen(!dialogOpen);
+		// フォームへの入力をクリア
+		setText('');
+	};
 
 	// 各hndle関数の共通処理を型定義する
 	// =>todo型のオブジェクトを受け取り、その中の特定のプロパティを指定した値に更新する処理
@@ -90,8 +98,10 @@ export const App = () => {
 	const [filter, setFilter] = useState<Filter>('all');
 
 	const handleSubmit = () => {
-		if (!text) return
-		
+		if (!text) {
+			setDialogOpen(false)
+			return
+		}
 		const newTodo: Todo = {
 			value: text,
 			id: new Date().getTime(),
@@ -103,9 +113,10 @@ export const App = () => {
 		// スプレッドは非破壊的なディープコピー(ネストされた参照先も変更される)
 		setTodos([newTodo, ...todos]);
 		setText("");
+		setDialogOpen(false);
 	}
 
-	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
 		setText(e.target.value);
 	};
 /*--以下3つの関数 
@@ -190,24 +201,26 @@ export const App = () => {
 				onToggleDrawer={handleToggleDrawer}
 				onToggleQR={handleToggleQR}
 			/>
-			<QR
-				open={qrOpen}
-				onClose={handleToggleQR}
-			/>
 			<ActionButton
 				onEmpty={handleEmpty}
 				todos={todos}
 			/>
 			<FormDialog
 				text={text}
+				dialogOpen={dialogOpen}
 				onChange={handleChange}
 				onSubmit={handleSubmit}
 				filter={filter}
+				onToggleDialog={handleToggleDialog}
 			/>
 			<TodoItem
 				todos={todos}
 				filter={filter}
 				onTodo={handleTodo}
+			/>
+			<QR
+				open={qrOpen}
+				onClose={handleToggleQR}
 			/>
 		</ThemeProvider>
 	);
